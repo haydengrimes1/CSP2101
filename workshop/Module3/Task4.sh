@@ -6,7 +6,7 @@ read -p "Please enter your Username: " username
 read -s -p "Please enter you Password: " password
 
 #Sending the output of echo to secret.txt
-echo "$username:$password" >> secret.txt
+echo "$username:$password" >> ../secret.txt
 
 
 
