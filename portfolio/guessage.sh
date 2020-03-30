@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Student Name: Hayden Grimes
+#Student Number: 
+
 # Define global variables
 age=0
 guess=0
