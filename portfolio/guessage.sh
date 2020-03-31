@@ -5,7 +5,7 @@
 
 # Define global variables
 age=0
-guess=0
+guess=-1
 counter=0
 minAge=20
 maxAge=70
@@ -140,7 +140,7 @@ function makeGuess () {
                 echo "    You're guess is greater then the Maximum Age"
                 sleep 3
                 clearScreen
-                guess=0
+                guess=-1
                 ((counter=counter+1))
             # Check if guess is less then the min age and warn user
             elif (( $guess < $minAge )); then
@@ -148,7 +148,7 @@ function makeGuess () {
                 echo "    You're guess is less then the Minimum Age"
                 sleep 3
                 clearScreen
-                guess=0
+                guess=-1
                 ((counter=counter+1))
             # If the guess is in between the min and max ages
             else
@@ -186,7 +186,7 @@ function makeGuess () {
             echo "    This will not count as a guess."
             sleep 4
             clearScreen
-            guess=0
+            guess=-1
         fi
     done
 }
@@ -195,7 +195,7 @@ function makeGuess () {
 function startGame () {
 
     age=0
-    guess=0
+    guess=-1
     counter=0
 
     clearScreen
