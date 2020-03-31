@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Student Name : Hayden Grimes
-# Student Number: 10424698
+# Student Number : 10424698
 
 # Define global variables
 age=0
