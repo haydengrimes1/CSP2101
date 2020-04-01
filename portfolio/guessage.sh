@@ -38,7 +38,7 @@ function changeMinAge () {
             if (( $locMinAge >= $maxAge )); then
                 clearScreen
                 echo "    The Minimum Age must be less then the Maximum Age"
-                sleep 4
+                sleep 3
             else
                 clearScreen
                 echo "    Minimum age changed to: $locMinAge"
@@ -49,7 +49,7 @@ function changeMinAge () {
             clearScreen
             echo "    You must enter a Positive Integer"
             locMinAge=maxAge+1
-            sleep 3
+            sleep 2
         fi
     done
 }
@@ -94,8 +94,8 @@ function homeScreen () {
         echo "  ----- Home Screen -----"
         echo -e "\n\n"
         echo "    1: Start Guessing Game"
-        echo "    2: Change Min Age   (Min Age = $minAge)"
-        echo "    3: Change Max Age   (Max Age = $maxAge)"
+        echo "    2: Change Minimum Age   (Min Age = $minAge)"
+        echo "    3: Change Maximum Age   (Max Age = $maxAge)"
         echo -e "\n"
         echo "    0: Exit"
         echo -e "\n\n"
@@ -109,6 +109,15 @@ function homeScreen () {
             "3")
                 changeMaxAge;;
             "0")
+                clearScreen
+                echo "    Exiting"
+                sleep 1
+                clearScreen
+                echo "    Exiting."
+                sleep 1
+                clearScreen
+                echo "    Exiting.."
+                sleep 1
                 clearScreen
                 echo "    Exiting..."
                 sleep 1
@@ -154,24 +163,32 @@ function makeGuess () {
             else
                 clearScreen
                 echo -e "    Your guess was: $guess\n\n\n"
-                echo "    Checking your guess..."
-                ((counter=counter+1))
-                sleep 2
+                echo "    Checking your guess."
+                sleep 1
                 clearScreen
+                echo -e "    Your guess was: $guess\n\n\n"
+                echo "    Checking your guess.."
+                sleep 1
+                clearScreen
+                echo -e "    Your guess was: $guess\n\n\n"
+                echo "    Checking your guess..."
+                sleep 1
+                clearScreen
+                ((counter=counter+1))
                 echo -e "\n\n\n\n\n"
                 # check if guess is correct
                 if [ $guess -eq $age ]; then
                     echo "    Correct"
-                    sleep 4
+                    sleep 3
                     clearScreen
                 # check if guess is greater then the random age
                 elif [ $guess -gt $age ]; then
-                    echo "    $guess is to High"
+                    echo "    $guess is too High"
                     sleep 2
                     clearScreen
                 # check if guess is less then the random age
                 elif [ $guess -lt $age ]; then
-                    echo "    $guess is to Low"
+                    echo "    $guess is too Low"
                     sleep 2
                     clearScreen
                 # Anything else. Should be impossible
@@ -202,8 +219,20 @@ function startGame () {
     echo "    Welcome to the Guessing Game"
     sleep 2
     clearScreen
+    echo "    Generating a Random Age between $minAge - $maxAge "
+    sleep 1
+    clearScreen
+    echo "    Generating a Random Age between $minAge - $maxAge ."
+    sleep 1
+    clearScreen
+    echo "    Generating a Random Age between $minAge - $maxAge .."
+    sleep 1
+    clearScreen
     echo "    Generating a Random Age between $minAge - $maxAge ..."
-    sleep 5
+    sleep 1
+    clearScreen
+    echo "    Generating a Random Age between $minAge - $maxAge ...." 
+    sleep 1
     clearScreen
     getRandomNumber
     echo "    Age has been Generated between $minAge - $maxAge"
