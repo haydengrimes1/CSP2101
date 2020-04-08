@@ -243,7 +243,7 @@ function startGame () {
     echo "    Amount of Guesses : $counter"
     echo "    Age : $age "
     echo -e "\n\n   Thanks for playing\n"
-    read -p "Press any button to return to the Home Screen..."
+    read -p "Press <Enter> to return to the Home Screen..."
     clearScreen
 }
 
