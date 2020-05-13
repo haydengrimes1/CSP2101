@@ -1,7 +1,6 @@
 #!/bin/bash
 
-ping 8.8.8.8
-
-echo "$?"
+x=$(( 20 - 11 / 2 ))
+echo $x
 
 exit 0

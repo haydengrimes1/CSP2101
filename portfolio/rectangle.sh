@@ -8,10 +8,9 @@ destinationFileName="./rectangle_f.txt"
 
 function checkSourceFile () {
     if [ -f $fileName ]; then
-        echo "HERE"
         true
     else
-        echo "$fileName doesn not exist.\n Please create or select a different File."
+        echo -e "\e[31m$fileName doesn not exist.\n Please create or select a different File.\e[39m"
         false
     fi
 }
@@ -20,21 +19,20 @@ function homeScreen () {
     selection=9
     until (( $selection == 0 ))
     do
-        echo -e "\nWelcome to the File Format Program.\n"
-        echo -e "Current Input File:\t" $fileName
-        echo -e "Current Output File:\t" $destinationFileName
-        echo -e "\n1: Format File"
-        echo -e "2: Change Input File"
-        echo -e "3: Change Output File\n"
-        echo -e "0: Exit Program\n\n"
+        echo -e "\e[96m\nWelcome to the File Format Program.\n"
+        echo -e "Current Input File:\t\e[36m" $fileName
+        echo -e "\e[96mCurrent Output File:\t\e[36m" $destinationFileName
+        echo -e "\e[96m\n1: \e[36mFormat File"
+        echo -e "\e[96m2: \e[36mChange Input File"
+        echo -e "\e[96m3: \e[36mChange Output File\n"
+        echo -e "\e[96m0: \e[31mExit Program\n\n\e[96m"
         read -p "Please enter your Selection: " selection
         case $selection in
             "1")
                 if [ -f $fileName ]; then
-                    echo "HERE"
                     sedFile
                 else
-                    echo -e "\nInput file '$fileName' doesn't not exist.\nPlease create or select a different File."
+                    echo -e "\e[31m\nInput file '$fileName' doesn't not exist.\nPlease create or select a different File.\e[39m"
                     selection=9
                 fi
                 ;;
@@ -46,7 +44,7 @@ function homeScreen () {
                 exit 0;;
             # Anything else inputted will throw error and reprint homescreen
             *)
-                echo "    Error: You did not enter a correct number"
+                echo -e "\e[31m\nError: You did not enter a correct number\e[39m"
                 selection=9;;
         esac
     done
@@ -54,43 +52,73 @@ function homeScreen () {
 
 function checkDestinationFile () {
     if [ -f $destinationFileName ]; then
-        echo $destinationFileName "already exists. Removing..."
+        echo -e "\e[91m\n$destinationFileName already exists. Removing...\e[39m"
         rm $destinationFileName
-        echo "Removed" $destinationFileName
+        echo -e "\e[91mRemoved $destinationFileName\e[39m"
     fi
 }
 
 function sedFile () {
-    checkDestinationFile
-    read header < $fileName
-    IFS=","
-    read -ra header <<< $header
-    sed -e '1d'\
-        -e 's/Rec/'${header[0]}': Rec/'\
-        -e 's/,/\t\t'${header[1]}': /'\
-        -e 's/,/\t\t'${header[2]}': /'\
-        -e 's/,/\t\t'${header[3]}': /'\
-        -e 's/,/\t\t'${header[4]}': /' $fileName > $destinationFileName
+    counter=0
+    dataAmount=0
+    error=0
+    while read -r line
+    do
+        ((counter++))
+        if [ $counter = 1 ]; then
+            IFS=","
+            read -ra data <<< $line
+            dataAmount=${#data[@]}
+        else
+            IFS=","
+            read -ra data <<< $line
+            if [ $dataAmount != ${#data[@]} ]; then
+                error=1
+                break
+            fi
+            string='Rec*'
+            if [[ "${data[0]}" != $string ]]; then
+                error=1
+                break
+            fi
+        fi
+    done < "$fileName"
+    if [ $error = 0 ]; then
+        checkDestinationFile
+        read header < $fileName
+        IFS=","
+        read -ra header <<< $header
+        sed -e '1d'\
+            -e 's/Rec/'${header[0]}': Rec/'\
+            -e 's/,/\t\t'${header[1]}': /'\
+            -e 's/,/\t\t'${header[2]}': /'\
+            -e 's/,/\t\t'${header[3]}': /'\
+            -e 's/,/\t\t'${header[4]}': /' $fileName > $destinationFileName
+        echo -e "\n\e[96m'$fileName' has been Formatted and saved at '$destinationFileName'"
+    else
+        echo -e "\e[31m\nInvalid Input File Format.\e[39m"
+    fi
+    
 }
 
 function changeSourceFile () {
     selection2=""
     until [ "$selection2" == "y" ] || [ "$selection2" == "n" ]
         do
-        echo -e "\nThe Current Input File is '" $fileName "'. Is this correct? (y/n)" 
+        echo -e "\e[96m\nThe Current Input File is '" $fileName "'. Is this correct? (y/n)" 
         read -p "Input 'y' or 'n': " selection2
         if [ $selection2 == "n" ]; then
             read -p "Please specify a new File: " answer
             if [ -f "$answer" ]; then
                 fileName=$answer
             else
-                echo -e "\nError: That file doesn't exist"
+                echo -e "\e[31m\nError: That file doesn't exist\e[39m"
                 selection2=""
             fi
         elif [ $selection2 == "y" ]; then
             selection2="y"
         else
-            echo -e "\nError: Please Input Either 'y' or 'n'"
+            echo -e "\e[31m\nError: Please Input Either 'y' or 'n'\e[39m"
             selection2=""
         fi
     done
@@ -100,14 +128,14 @@ function changeDestinationFile () {
     selection2=""
     until [ "$selection2" == "y" ] || [ "$selection2" == "n" ]
         do
-        echo -e "\nThe Current Output file is '" $destinationFileName "'. Is this correct? (y/n)" 
+        echo -e "\e[96m\nThe Current Output file is '" $destinationFileName "'. Is this correct? (y/n)" 
         read -p "Input 'y' or 'n': " selection2
         if [ $selection2 == "n" ]; then
             read -p "Please specify a new File: " destinationFileName
         elif [ $selection2 == "y" ]; then
             selection2="y"
         else
-            echo -e "\nError: Please Input Either 'y' or 'n'"
+            echo -e "\e[31m\nError: Please Input Either 'y' or 'n'\e[39m"
             selection2=""
         fi
     done
