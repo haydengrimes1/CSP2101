@@ -3,6 +3,7 @@
 downloadAmount=0
 downloadFolder="./downloads"
 yesToAll="false"
+avalibleImages=""
 
 function downloadThumbnail () {
     local website="https://secure.ecu.edu.au/service-centres/MACSC/gallery/152/DSC0"
@@ -37,7 +38,49 @@ function downloadThumbnail () {
         echo -e "Download Complete\n"
     fi
 }
+function downloadSingleThumb () {
+    choice=0
+    while [ $choice -lt 1533 ] || [ $choice -gt 2042 ] ; do
+    echo -e "\e[96m"
+    read -p "Which File Number would you like to download: " choice
+        re='^[0-9]+$'
+        if ! [[ $choice =~ $re ]]; then
+            echo -e "\e[31mError: Please enter a Number within the range of 1533 - 2042\e[96m"
+            choice=0
+        elif [ $choice -lt 1533 ] || [ $choice -gt 2042 ]; then
+            echo -e "\e[31mError: Please enter a Number within the range of 1533 - 2042\e[96m"
+        fi
+    done
+    local website="https://secure.ecu.edu.au/service-centres/MACSC/gallery/152/DSC0$choice.jpg"
+    response=`curl -sI $website | grep -i http/1.1 | awk '{printf $2}'`
+    if [ $response == 200 ]; then
+        downloadThumbnail $choice
+    else
+        echo -e "\n\e[31mError: Image '$choice' doesn't exist.\e[96m"
+    fi
 
+}
+
+#function imagesToDownload () {
+#    local startNum=1533
+#    local endNum=2042
+#    local current=$startNum
+#    echo "Checking which files are avalible now..."
+#    if [[ $avalibleImages == "" ]] ; then
+#        echo "This may take some time"
+#        while [ $current -le $endNum ]
+#            do
+#            local website="https://secure.ecu.edu.au/service-centres/MACSC/gallery/152/DSC0$current.jpg"
+#            response=`curl -sI $website | grep -i http/1.1 | awk '{printf $2}'`
+#            if [ $response == 200 ]; then
+#                avalibleImages="$avalibleImages$current\t"
+#            fi
+#            ((current++))
+#        done
+#    fi
+#    echo -e $avalibleImages
+
+#}
 function downloadAllThumb () {
     yesToAll="false"
     downloadAmount=0
@@ -55,10 +98,31 @@ function downloadAllThumb () {
 }
 
 function downloadRangeThumb () {
+    echo -e "\nPlease enter the Range in which you wish to download..."
+    local startNum=0
+    local endNum=0
+    while [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ] ; do
+        read -p "Please enter First Number in Range: " startNum
+        re='^[0-9]+$'
+        if ! [[ $startNum =~ $re ]]; then
+            echo "Please enter a Number within the range of 1533 - 2042"
+            startNum=0
+        elif [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ]; then
+            echo "Please enter a Number within the range of 1533 - 2042"
+        fi
+    done
+    while [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ] ; do
+        read -p "Please enter Last Number in Range: " endNum
+        re='^[0-9]+$'
+        if ! [[ $endNum =~ $re ]]; then
+            echo "Please enter a Number within the range of $startNum - 2042"
+            endNum=0
+        elif [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ]; then
+            echo "Please enter a Number within the range of $startNum - 2042"
+        fi
+    done
     yesToAll="false"
     downloadAmount=0
-    local startNum=$1
-    local endNum=$2
     local current=$startNum
     while [ $current -le $endNum ]
         do
@@ -66,6 +130,7 @@ function downloadRangeThumb () {
         ((current++))
     done
     echo "$downloadAmount Files Downloaded"
+    read -p "Press <Enter> to return to the Home Screen..."
 
 }
 
@@ -124,16 +189,18 @@ function homescreen () {
         #Case statement to handle users selection
         case $selection in
             "1")
-                echo;;
+                downloadSingleThumb;;
                 
             "2")
                 downloadAllThumb;;
             "3")
-                echo;;
+                downloadRangeThumb 1533 1700;;
             "4")
                 downloadRandom;;
             "5")
                 changeDownloadFolder;;
+            #"6")
+            #    imagesToDownload;;
             "0")
                 exit 0;;
             # Anything else inputted will throw error and reprint homescreen
