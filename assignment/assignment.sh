@@ -15,7 +15,7 @@ function downloadThumbnail () {
         # Until loop to ensure users doesnt specify anything other then y or n
         until [ "$selection2" == "y" ] || [ "$selection2" == "n" ] || [ "$yesToAll" == "true" ]
             do
-            echo -e "$output has already been Downloaded"
+            echo -e "\e[96m$output has already been Downloaded"
             read -p "Would you like to Override? (y/n/y2all): " selection2
             if [ $selection2 == "n" ]; then
                 return
@@ -92,33 +92,33 @@ function downloadAllThumb () {
         downloadThumbnail $current
         ((current++))
     done
-    echo "$downloadAmount Files Downloaded"
+    echo -e "\e[96m$downloadAmount Files Downloaded"
     read -p "Press <Enter> to return to the Home Screen..."
 
 }
 
 function downloadRangeThumb () {
-    echo -e "\nPlease enter the Range in which you wish to download..."
+    echo -e "\e[96m\nPlease enter the Range in which you wish to download..."
     local startNum=0
     local endNum=0
     while [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ] ; do
         read -p "Please enter First Number in Range: " startNum
         re='^[0-9]+$'
         if ! [[ $startNum =~ $re ]]; then
-            echo "Please enter a Number within the range of 1533 - 2042"
+            echo -e "\e[31mError: Please enter a Number within the range of 1533 - 2042\e[96m"
             startNum=0
         elif [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ]; then
-            echo "Please enter a Number within the range of 1533 - 2042"
+            echo -e "\e[31mPlease enter a Number within the range of 1533 - 2042\e[96m"
         fi
     done
     while [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ] ; do
         read -p "Please enter Last Number in Range: " endNum
         re='^[0-9]+$'
         if ! [[ $endNum =~ $re ]]; then
-            echo "Please enter a Number within the range of $startNum - 2042"
+            echo -e "\e[31mPlease enter a Number within the range of $startNum - 2042\e[96m"
             endNum=0
         elif [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ]; then
-            echo "Please enter a Number within the range of $startNum - 2042"
+            echo -e "\e[31mPlease enter a Number within the range of $startNum - 2042\e[96m"
         fi
     done
     yesToAll="false"
@@ -129,13 +129,14 @@ function downloadRangeThumb () {
         downloadThumbnail $current
         ((current++))
     done
-    echo "$downloadAmount Files Downloaded"
+    echo -e "\e[96m$downloadAmount Files Downloaded"
     read -p "Press <Enter> to return to the Home Screen..."
 
 }
 
 function downloadRandom () {
     yesToAll="false"
+    echo -e "\e[96m"
     read -p "How many images would you like to download: " ranAmount
     downloadAmount=0
     local startNum=1533
@@ -146,7 +147,7 @@ function downloadRandom () {
         number=$((RANDOM%(difference+1) + $startNum))
         downloadThumbnail $number
     done
-    echo "$downloadAmount Files Downloaded"
+    echo -e "\e[96m$downloadAmount Files Downloaded"
     read -p "Press <Enter> to return to the Home Screen..."
 }
 
@@ -165,7 +166,7 @@ function changeDownloadFolder () {
         elif [ $selection2 == "y" ]; then
             selection2="y"
         else
-            echo -e "\e[31m\nError: Please Input Either 'y' or 'n'\e[39m"
+            echo -e "\e[31m\nError: Please Input Either 'y' or 'n'\e[96m"
             selection2=""
         fi
     done
