@@ -150,7 +150,7 @@ function downloadRandom () {
             if [ $ranAmount -gt 75 ]; then
                 echo -e "There are only 75 Images to Download"
             fi
-            echo -e "\e[31mError: Please enter a Number betweene 0 - 75\e[96m\n"
+            echo -e "\e[31mError: Please enter a Number between 0 - 75\e[96m\n"
         fi
     done       
     echo -e ""
