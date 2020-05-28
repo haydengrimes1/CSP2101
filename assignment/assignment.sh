@@ -42,13 +42,13 @@ function downloadSingleThumb () {
     choice=0
     while [ $choice -lt 1533 ] || [ $choice -gt 2042 ] ; do
     echo -e "\e[96m"
-    read -p "Which File Number would you like to download: " choice
+    read -p "Which File would you like to download: DSC0" choice
         re='^[0-9]+$'
         if ! [[ $choice =~ $re ]]; then
-            echo -e "\e[31mError: Please enter a Number within the range of 1533 - 2042\e[96m"
+            echo -e "\e[31mError: Please enter a File within the range of DSC01533 - DSC02042\e[96m"
             choice=0
         elif [ $choice -lt 1533 ] || [ $choice -gt 2042 ]; then
-            echo -e "\e[31mError: Please enter a Number within the range of 1533 - 2042\e[96m"
+            echo -e "\e[31mError: Please enter a File within the range of DSC01533 - DSC02042\e[96m"
         fi
     done
     local website="https://secure.ecu.edu.au/service-centres/MACSC/gallery/152/DSC0$choice.jpg"
@@ -57,6 +57,7 @@ function downloadSingleThumb () {
         downloadThumbnail $choice
     else
         echo -e "\n\e[31mError: Image '$choice' doesn't exist.\e[96m"
+        read -p "Press <Enter> to return to the Home Screen..."
     fi
 
 }
@@ -102,25 +103,26 @@ function downloadRangeThumb () {
     local startNum=0
     local endNum=0
     while [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ] ; do
-        read -p "Please enter First Number in Range: " startNum
+        read -p "Please enter First File in Range: DSC0" startNum
         re='^[0-9]+$'
         if ! [[ $startNum =~ $re ]]; then
-            echo -e "\e[31mError: Please enter a Number within the range of 1533 - 2042\e[96m"
+            echo -e "\e[31mError: Please enter a File within the range of DSC01533 - DSC02042\e[96m"
             startNum=0
         elif [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ]; then
-            echo -e "\e[31mPlease enter a Number within the range of 1533 - 2042\e[96m"
+            echo -e "\e[31mPlease enter a File within the range of DSC01533 - DSC02042\e[96m"
         fi
     done
     while [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ] ; do
-        read -p "Please enter Last Number in Range: " endNum
+        read -p "Please enter Last File in Range: DSC0" endNum
         re='^[0-9]+$'
         if ! [[ $endNum =~ $re ]]; then
-            echo -e "\e[31mPlease enter a Number within the range of $startNum - 2042\e[96m"
+            echo -e "\e[31mPlease enter a File within the range of DSC0$startNum - DSC02042\e[96m"
             endNum=0
         elif [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ]; then
-            echo -e "\e[31mPlease enter a Number within the range of $startNum - 2042\e[96m"
+            echo -e "\e[31mPlease enter a File within the range of DSC0$startNum - DSC02042\e[96m"
         fi
     done
+    echo -e ""
     yesToAll="false"
     downloadAmount=0
     local current=$startNum
@@ -137,7 +139,21 @@ function downloadRangeThumb () {
 function downloadRandom () {
     yesToAll="false"
     echo -e "\e[96m"
-    read -p "How many images would you like to download: " ranAmount
+    ranAmount=0
+    while [ $ranAmount == 0 ] || [ $ranAmount -gt 75 ] ; do
+        read -p "How many images would you like to download: " ranAmount
+        re='^[0-9]+$'
+        if ! [[ $ranAmount =~ $re ]]; then
+            echo -e "\e[31mError: Please enter a Number between 0 - 75\e[96m\n"
+            ranAmount=0
+        elif [ $ranAmount == 0 ] || [ $ranAmount -gt 75 ]; then
+            if [ $ranAmount -gt 75 ]; then
+                echo -e "There are only 75 Images to Download"
+            fi
+            echo -e "\e[31mError: Please enter a Number betweene 0 - 75\e[96m\n"
+        fi
+    done       
+    echo -e ""
     downloadAmount=0
     local startNum=1533
     local endNum=2042
@@ -163,6 +179,9 @@ function changeDownloadFolder () {
         if [ $selection2 == "n" ]; then
         # Prompts for input of new file name and sets answer to the global variable
             read -p "Please specify a new Download Folder: " downloadFolder
+            if [ ! -d $downloadFolder ]; then
+                mkdir $downloadFolder
+            fi
         elif [ $selection2 == "y" ]; then
             selection2="y"
         else
@@ -174,6 +193,9 @@ function changeDownloadFolder () {
 
 function homescreen () {
     selection=9
+    if [ ! -d $downloadFolder ]; then
+                mkdir $downloadFolder
+    fi
     #Until loop to repeat selection until user exits
     until (( $selection == 0 ))
     do
