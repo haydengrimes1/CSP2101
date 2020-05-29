@@ -62,26 +62,6 @@ function downloadSingleThumb () {
 
 }
 
-#function imagesToDownload () {
-#    local startNum=1533
-#    local endNum=2042
-#    local current=$startNum
-#    echo "Checking which files are avalible now..."
-#    if [[ $avalibleImages == "" ]] ; then
-#        echo "This may take some time"
-#        while [ $current -le $endNum ]
-#            do
-#            local website="https://secure.ecu.edu.au/service-centres/MACSC/gallery/152/DSC0$current.jpg"
-#            response=`curl -sI $website | grep -i http/1.1 | awk '{printf $2}'`
-#            if [ $response == 200 ]; then
-#                avalibleImages="$avalibleImages$current\t"
-#            fi
-#            ((current++))
-#        done
-#    fi
-#    echo -e $avalibleImages
-
-#}
 function downloadAllThumb () {
     yesToAll="false"
     downloadAmount=0
@@ -222,8 +202,6 @@ function homescreen () {
                 downloadRandom;;
             "5")
                 changeDownloadFolder;;
-            #"6")
-            #    imagesToDownload;;
             "0")
                 exit 0;;
             # Anything else inputted will throw error and reprint homescreen
