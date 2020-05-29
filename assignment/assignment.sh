@@ -116,15 +116,19 @@ function downloadAllThumb () {
     read -p "Press <Enter> to return to the Home Screen..."
 
 }
-
+# Function to Download all images in a user defined range
 function downloadRangeThumb () {
     echo -e "\e[96m\nPlease enter the Range in which you wish to download..."
     local startNum=0
     local endNum=0
+    # While loop to ensure starting number is between 1533 and 2042
     while [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ] ; do
         read -p "Please enter First File in Range: DSC0" startNum
+        # Set varaible to use for regular expression
+        # Ensures that input only contains numbers
         re='^[0-9]+$'
-        if ! [[ $startNum =~ $re ]]; then
+        # If statement to see if input has anything other then digits
+                if ! [[ $startNum =~ $re ]]; then
             echo -e "\e[31mError: Please enter a File within the range of DSC01533 - DSC02042\e[96m"
             startNum=0
         elif [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ]; then
@@ -133,7 +137,10 @@ function downloadRangeThumb () {
     done
     while [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ] ; do
         read -p "Please enter Last File in Range: DSC0" endNum
+        # Set varaible to use for regular expression
+        # Ensures that input only contains numbers
         re='^[0-9]+$'
+        # If statement to see if input has anything other then digits
         if ! [[ $endNum =~ $re ]]; then
             echo -e "\e[31mPlease enter a File within the range of DSC0$startNum - DSC02042\e[96m"
             endNum=0
