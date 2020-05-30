@@ -7,7 +7,7 @@
 downloadAmount=0
 downloadFolder="./downloads"
 yesToAll="false"
-avalibleImages=""
+downloadSize=0
 
 #Function to download single image
 # Takes last 4 digits of image number as input
@@ -55,9 +55,12 @@ function downloadThumbnail () {
     # Set filesize variable to outcome of curl, Same as above for response
     # grep command finds lines with content-length
     # awk commands prints the second command which is the file size in bits, Divides the answer by 1024 to get the value in KB, Asnwer is then rounded to 2 decimal spaces
-        filesize=`curl -sI $website | grep -i content-length | awk '{printf "%.2f KB", $2/1024}'`
+        filesize=`curl -sI $website | grep -i content-length | awk '{print $2}'`
+        # Add file size to total download size variable for multiple downloads
+        downloadSize=`awk '{print $1+$2}' <<<"${downloadSize} ${filesize}"`
+        filesize=`awk '{printf "%.2f", $1/1024}' <<<"${filesize}"`
         # Print message saying file being downloaded
-        echo "Downloading DSC0$1, with the filename '$output', with a file size of $filesize..."
+        echo -e "Downloading DSC0$1, with the filename '$output', with a file size of $filesize KB..."
         # Download image and save to output folder and file
         curl -s $website > $downloadFolder"/"$output
         #Add one to download amount to keep count of downloads when multiple are taking place
@@ -99,9 +102,10 @@ function downloadSingleThumb () {
 }
 # Function to download all Images
 function downloadAllThumb () {
-    # Resets both yestoall variables and download amount.
+    # Resets yestoall, download amount and download size variables.
     yesToAll="false"
     downloadAmount=0
+    downloadSize=0
     local startNum=1533
     local endNum=2042
     local current=$startNum
@@ -111,8 +115,34 @@ function downloadAllThumb () {
         downloadThumbnail $current
         ((current++))
     done
-    #Once all downloaded, prints how many files were downloaded
-    echo -e "\e[96m$downloadAmount Files Downloaded"
+    # If statement checks if total download size it above 1024 bytes
+    if (( $downloadSize > 1024 )); then
+    # Awk command rounds download size by 1024 to get the size in KB
+        downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+        # Rounds download size to a whole number to use for next if statement
+        downloadSizeRound=`awk '{printf "%.0f", $1}' <<<"${downloadSize}"`
+        # checks if rounded amount is more then 1024 to get size in MB
+        if (( $downloadSizeRound > 1024 )); then
+        # Same steps as above
+            downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+            downloadSizeRound=`awk '{printf "%.0f", $1}' <<<"${downloadSize}"`
+            # Checks if rounded amoutn is more then 1024 to get GB value
+            if (( $downloadSizeRound > 1024 )); then
+                downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+                # Prints message if download size is at least 1 gb
+                echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize GB"
+            else
+            # Prints message if download size is at least 1 MB
+                echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize MB"
+            fi
+        else
+        # Print message if download size is at least 1 KB
+            echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize KB"
+        fi
+    else
+    # Print message if download size is anything less then 1 KB (Only happen if nothing is downloaded)
+        echo -e "\e[96m$downloadAmount Files Downloaded"
+    fi 
     read -p "Press <Enter> to return to the Home Screen..."
 
 }
@@ -149,23 +179,83 @@ function downloadRangeThumb () {
         fi
     done
     echo -e ""
+    # Resets yestoall, download amount and download size variables.
     yesToAll="false"
     downloadAmount=0
+    downloadSize=0
     local current=$startNum
+    # While loop to loop through all numbers between the current and the end number and run download function 
     while [ $current -le $endNum ]
         do
         downloadThumbnail $current
         ((current++))
     done
-    echo -e "\e[96m$downloadAmount Files Downloaded"
+ # If statement checks if total download size it above 1024 bytes
+    if (( $downloadSize > 1024 )); then
+    # Awk command rounds download size by 1024 to get the size in KB
+        downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+        # Rounds download size to a whole number to use for next if statement
+        downloadSizeRound=`awk '{printf "%.0f", $1}' <<<"${downloadSize}"`
+        # checks if rounded amount is more then 1024 to get size in MB
+        if (( $downloadSizeRound > 1024 )); then
+        # Same steps as above
+            downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+            downloadSizeRound=`awk '{printf "%.0f", $1}' <<<"${downloadSize}"`
+            # Checks if rounded amoutn is more then 1024 to get GB value
+            if (( $downloadSizeRound > 1024 )); then
+                downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+                # Prints message if download size is at least 1 gb
+                echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize GB"
+            else
+            # Prints message if download size is at least 1 MB
+                echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize MB"
+            fi
+        else
+        # Print message if download size is at least 1 KB
+            echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize KB"
+        fi
+    else
+    # Print message if download size is anything less then 1 KB (Only happen if nothing is downloaded)
+        echo -e "\e[96m$downloadAmount Files Downloaded"
+    fi 
     read -p "Press <Enter> to return to the Home Screen..."
-
 }
 
 function downloadRandom () {
     yesToAll="false"
     echo -e "\e[96m"
     ranAmount=0
+    local startNum=0
+    local endNum=0
+    echo -e "\e[96m\nPlease enter the Range in which you wish to download..."
+    # While loop to ensure starting number is between 1533 and 2042
+    while [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ] ; do
+        read -p "Please enter First File in Range: DSC0" startNum
+        # Set varaible to use for regular expression
+        # Ensures that input only contains numbers
+        re='^[0-9]+$'
+        # If statement to see if input has anything other then digits
+                if ! [[ $startNum =~ $re ]]; then
+            echo -e "\e[31mError: Please enter a File within the range of DSC01533 - DSC02042\e[96m"
+            startNum=0
+        elif [ $startNum -lt 1533 ] || [ $startNum -gt 2042 ]; then
+            echo -e "\e[31mPlease enter a File within the range of DSC01533 - DSC02042\e[96m"
+        fi
+    done
+    while [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ] ; do
+        read -p "Please enter Last File in Range: DSC0" endNum
+        # Set varaible to use for regular expression
+        # Ensures that input only contains numbers
+        re='^[0-9]+$'
+        # If statement to see if input has anything other then digits
+        if ! [[ $endNum =~ $re ]]; then
+            echo -e "\e[31mPlease enter a File within the range of DSC0$startNum - DSC02042\e[96m"
+            endNum=0
+        elif [ $endNum -gt 2042 ] || [ $endNum -lt $startNum ]; then
+            echo -e "\e[31mPlease enter a File within the range of DSC0$startNum - DSC02042\e[96m"
+        fi
+    done
+    # While loop to ensure user only enters a number between 0 and 75 as there are only 75 images to download
     while [ $ranAmount == 0 ] || [ $ranAmount -gt 75 ] ; do
         read -p "How many images would you like to download: " ranAmount
         re='^[0-9]+$'
@@ -180,16 +270,45 @@ function downloadRandom () {
         fi
     done       
     echo -e ""
+    # Reset download amount and size variables
     downloadAmount=0
-    local startNum=1533
-    local endNum=2042
+    downloadSize=0
+    # Until loop loops adding one each time untill reaches the run amount entered by user (Only counts if user choices to download in the case an image has already been downloaded)
     until [ $downloadAmount -ge $ranAmount ]
         do
+        # Equation to get a random number within the entered range
         ((difference=$endNum-$startNum))
         number=$((RANDOM%(difference+1) + $startNum))
         downloadThumbnail $number
     done
-    echo -e "\e[96m$downloadAmount Files Downloaded"
+# If statement checks if total download size it above 1024 bytes
+    if (( $downloadSize > 1024 )); then
+    # Awk command rounds download size by 1024 to get the size in KB
+        downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+        # Rounds download size to a whole number to use for next if statement
+        downloadSizeRound=`awk '{printf "%.0f", $1}' <<<"${downloadSize}"`
+        # checks if rounded amount is more then 1024 to get size in MB
+        if (( $downloadSizeRound > 1024 )); then
+        # Same steps as above
+            downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+            downloadSizeRound=`awk '{printf "%.0f", $1}' <<<"${downloadSize}"`
+            # Checks if rounded amoutn is more then 1024 to get GB value
+            if (( $downloadSizeRound > 1024 )); then
+                downloadSize=`awk '{printf "%.2f", $1/1024}' <<<"${downloadSize}"`
+                # Prints message if download size is at least 1 gb
+                echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize GB"
+            else
+            # Prints message if download size is at least 1 MB
+                echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize MB"
+            fi
+        else
+        # Print message if download size is at least 1 KB
+            echo -e "\e[96m$downloadAmount Files Downloaded, with a total size of $downloadSize KB"
+        fi
+    else
+    # Print message if download size is anything less then 1 KB (Only happen if nothing is downloaded)
+        echo -e "\e[96m$downloadAmount Files Downloaded"
+    fi 
     read -p "Press <Enter> to return to the Home Screen..."
 }
 
@@ -205,6 +324,7 @@ function changeDownloadFolder () {
         if [ $selection2 == "n" ]; then
         # Prompts for input of new file name and sets answer to the global variable
             read -p "Please specify a new Download Folder: " downloadFolder
+            # Checks if folder exists and if not makes it
             if [ ! -d $downloadFolder ]; then
                 mkdir $downloadFolder
             fi
@@ -216,9 +336,10 @@ function changeDownloadFolder () {
         fi
     done
 }
-
+# Main function that runs the homescreen
 function homescreen () {
     selection=9
+    # Checks if download folder exisist and creates it if it doesnt
     if [ ! -d $downloadFolder ]; then
                 mkdir $downloadFolder
     fi
@@ -258,6 +379,6 @@ function homescreen () {
     done
 
 }
-
+# Initialise the home screen
 homescreen
 exit 0
