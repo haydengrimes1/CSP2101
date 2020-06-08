@@ -108,15 +108,10 @@ function sedFile () {
         # Runs Sed command
         # Deletes the header line
         sed -e '1d'\
-        # Formats the first Field (Name field)
             -e 's/Rec/'${header[0]}': Rec/'\
-        # Formats the second Field
             -e 's/,/\t\t'${header[1]}': /'\
-        # Formats the third Field
             -e 's/,/\t\t'${header[2]}': /'\
-        # Formats the fourth Field
             -e 's/,/\t\t'${header[3]}': /'\
-        # Formats the fifth Field and defines source and destination file
             -e 's/,/\t\t'${header[4]}': /' $fileName > $destinationFileName
         echo -e "\n\e[96m'$fileName' has been Formatted and saved at '$destinationFileName'"
     else
